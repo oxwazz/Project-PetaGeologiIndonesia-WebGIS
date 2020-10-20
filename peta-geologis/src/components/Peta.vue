@@ -1,57 +1,78 @@
 <template>
+<l-map ref="map" :zoom="zoom" :center="center" style="height:100vh">
+    <l-control-zoom position="bottomright"></l-control-zoom>
+    <v-geosearch :options="geosearchOptions" ></v-geosearch>
+    <l-control-fullscreen position="topleft"></l-control-fullscreen>
+    <l-control-layers position="topright"></l-control-layers>
+    <l-tile-layer
+        v-for="tileProvider in tileProviders"
+        :key="tileProvider.name"
+        :name="tileProvider.name"
+        :visible="tileProvider.visible"
+        :url="tileProvider.url"
+        layer-type="base"/>
     <div>
-        <div id="mapid" style="height: 100vh"></div>
+        <l-rectangle ref="rec" v-for="(data, i) in rectangle.bounds" :key="i" :bounds="data" :l-style="rectangle.style" >
+            <l-popup style="width: 300px;">
+                {{ rectangle.data[i].lembar_peta }}<br>
+                {{ rectangle.data[i].skala }}<br><br><br>
+                <a :href="`/peta/${rectangle.data[i].id}`">More Details</a><br><br>
+                <img :src="`http://localhost:3000/peta/${rectangle.data[i].id}/photo?t=${rectangle.data[i].img}`" style="width: 300px;"><br>
+            </l-popup>
+        </l-rectangle>
     </div>
+</l-map>
 </template>
 
 <script>
 const axios = require('axios')
+import L from 'leaflet'
+import { OpenStreetMapProvider } from 'leaflet-geosearch'
+import { LMap, LTileLayer, LRectangle, LPopup, LControlLayers, LControlZoom } from 'vue2-leaflet'
+import VGeosearch from 'vue2-leaflet-geosearch'
+import LControlFullscreen from 'vue2-leaflet-fullscreen'
+
+// fix the marker
+L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.3.4/dist/images/";
 
 export default {
-    async mounted() {
-        var L = window.L;
+    components: { LMap, LTileLayer, LRectangle, LPopup, LControlLayers, LControlZoom, VGeosearch, LControlFullscreen },
+    data () {
+        return {
+            url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            center: [-0.789275, 113.921326],
+            zoom: 5,
+            tileProviders: [
+                {
+                    name: 'ArcGISMap World Imagery',
+                    visible: true,
+                    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                },
+                {
+                    name: 'OpenStreetMap',
+                    visible: false,
+                    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                }
+            ],
+            rectangle: {
+                bounds: [],
+                data: [],
+                style: { color: 'red', weight: 3 }
+            },
+            geosearchOptions: { // Important part Here
+                provider: new OpenStreetMapProvider(),
+            },
+        }
+    },
 
-        var mymap = L.map('mapid').setView([-0.789275, 113.921326], 5);
+    async mounted () {
+        // delete zoom default
+       this.$refs.map.mapObject.zoomControl.remove()
 
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-        }).addTo(mymap);
-
-        // create the geocoding control and add it to the map
-        let searchControl = L.esri.Geocoding.geosearch().addTo(mymap);
-    
-        // create an empty layer group to store the results and add it to the map
-        let results = L.layerGroup().addTo(mymap);
-    
-        // listen for the results event and add every result to the map
-        searchControl.on("results", () => {
-            results.clearLayers();
-        });
-
-        // create a red polygon from an array of LatLng points
-        const petas = await axios.get('http://localhost:3000/peta')
-       
-        for (let peta of petas.data) {
-            L.polygon([
-                    [peta.a, peta.b],
-                    [peta.c, peta.b],
-                    [peta.c, peta.d],
-                    [peta.a, peta.d]
-                    ], {color: 'red'})
-                .addTo(mymap)
-                .bindPopup(
-                    `<div style="width: 300px;">
-
-                    <b>
-                        ${peta.lembar_peta} <br>
-                        ${peta.skala}
-                    </b>
-                    <br><br>
-                    <a href="/peta/${peta.id}">More Details</a>
-                    <img src="http://localhost:3000/peta/photo/${peta.id}" style="width: 300px;">
-                    </div>
-                    `
-                )
+        const rows = await axios.get(`http://localhost:3000/peta`)
+        for (let i of rows.data) {
+            this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
+            this.rectangle.data.push(i)
         }
     }
 }

@@ -30,11 +30,11 @@
 </template>
 
 <script>
-    export default {
-        methods: {
-            navigateToPeta() {
-                this.$router.push('/peta')
-            }
+export default {
+    methods: {
+        navigateToPeta() {
+            this.$router.push('/peta')
         }
     }
+}
 </script>

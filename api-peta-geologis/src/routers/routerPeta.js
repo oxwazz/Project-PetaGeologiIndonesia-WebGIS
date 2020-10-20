@@ -1,22 +1,15 @@
 const path = require('path')
 const fs = require('fs')
 const express = require('express')
-const multer = require('multer')
 const pool = require('../db/postgresql')
-
-const imageFolder = path.resolve(__dirname, '../../public/img')
+const upload = require('../middleware/upload')
 
 const router = express.Router()
 
-router.get('/peta/photo/:id', async (req, res) => {
-    try {
-        const { id } = req.params
-        const { rows } = await pool.query(`SELECT img FROM maps WHERE id=${id}`)
-        res.set('Content-Type', 'image/jpg')
-        res.send(fs.readFileSync(path.resolve(__dirname, `../../public/img/${rows[0].img}`)))
-    } catch(e) {
-        res.send(e)
-    }
+router.post('/app/status', (req, res) => {
+    const coba = req.query.to
+    console.log(coba)
+    res.send({coba})
 })
 
 router.get('/peta', async (req, res) => {
@@ -34,26 +27,7 @@ router.get('/peta', async (req, res) => {
     }
 })
 
-let storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, imageFolder)
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + '.jpg')
-    }
-})
-
-let upload = multer({
-    fileFilter: function (req, file, cb) {
-        if (Object.values(JSON.parse(req.body.json)).includes('')) {
-            return cb(null, false)
-        }
-        cb(null, true)
-    },
-    storage: storage
-})
-
-router.post('/peta', upload.single('image'), async (req, res) => {
+router.post('/peta', upload, async (req, res) => {
     try {
         if (Object.values(JSON.parse(req.body.json)).includes('')) {
             throw {error: 'gaoleh kosong lur'}
@@ -69,30 +43,14 @@ router.post('/peta', upload.single('image'), async (req, res) => {
         const row = await pool.query(`
             insert into
             maps(
-                "lembar_peta",
-                "skala",
-                "tahun",
-                "penyusun",
-                "penerbit",
-                "img_tif",
-                "img",
-                "a",
-                "b",
-                "c",
-                "d"
+                "lembar_peta", "skala", "tahun",
+                "penyusun", "penerbit", "img_tif", "img",
+                "a", "b", "c", "d"
             )
             values(
-                '${indexPeta}', 
-                '${skala}', 
-                '${tahun}', 
-                '${penyusun}', 
-                '${penerbit}', 
-                '12', 
-                '${filename}', 
-                '${a}', 
-                '${b}', 
-                '${c}', 
-                '${d}'
+                '${indexPeta}', '${skala}', '${tahun}', 
+                '${penyusun}', '${penerbit}', '12', '${filename}',
+                '${a}', '${b}', '${c}', '${d}'
             )`
         )
         
@@ -102,7 +60,6 @@ router.post('/peta', upload.single('image'), async (req, res) => {
         console.log(e)
         res.send(e)
     }
-    
 })
 
 router.get('/peta/:id', async (req, res) => {
@@ -111,8 +68,7 @@ router.get('/peta/:id', async (req, res) => {
     res.send(rows)
 })
 
-router.put('/peta/:id', upload.single('image'), async (req, res) => {
-
+router.put('/peta/:id', upload, async (req, res) => {
     try {
         if (Object.values(JSON.parse(req.body.json)).includes('')) {
             throw {error: 'gaoleh kosong lur'}
@@ -143,7 +99,7 @@ router.put('/peta/:id', upload.single('image'), async (req, res) => {
         } else {
             const { filename } = req.file
             deleteImageExist(id)
-
+            
             const row = await pool.query(`
                 UPDATE
                     maps
@@ -162,6 +118,7 @@ router.put('/peta/:id', upload.single('image'), async (req, res) => {
                 WHERE
                     id = ${id}`
             )
+
             console.log(`Successfully ${row.command.toLowerCase()} ${row.rowCount} row on ID: ${id}`)
             res.send(`Successfully ${row.command.toLowerCase()} ${row.rowCount} row on ID: ${id}`)
         }
@@ -173,14 +130,23 @@ router.put('/peta/:id', upload.single('image'), async (req, res) => {
 router.delete('/peta/:id', async (req, res) => {
     const id = req.params.id
     deleteImageExist(id)
-
     const row = await pool.query(`DELETE FROM maps WHERE id=${id}`)
-    
     console.log(`Successfully ${row.command.toLowerCase()} ${row.rowCount} row on ID: ${id}`)
     res.send(`Successfully ${row.command.toLowerCase()} ${row.rowCount} row on ID: ${id}`)
 })
 
-router.get('/', (req, res) => {
+router.get('/peta/:id/photo', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { rows } = await pool.query(`SELECT img FROM maps WHERE id=${id}`)
+        res.set('Content-Type', 'image/jpg')
+        res.send(fs.readFileSync(path.resolve(__dirname, `../../public/img/${rows[0].img}`)))
+    } catch(e) {
+        res.send(e)
+    }
+})
+
+router.get('/*', (req, res) => {
     res.send({ error: 'salah alamat lur' })
 })
 

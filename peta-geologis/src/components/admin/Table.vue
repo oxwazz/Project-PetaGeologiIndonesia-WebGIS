@@ -148,24 +148,22 @@ export default {
             selectedRow: { id: 0, index: 0 }
         }
     },
-    async mounted() {
-        const rows = await axios.get('http://localhost:3000/peta?page=1&show=7')
-        this.rows = rows.data
-        this.page = 1
+    mounted() {
+        this.refreshData()
     },
     methods: {
-        async previous() {
+        previous() {
             this.page--
             if (this.page <= 0) {
                 this.page = 1
             }
             this.refreshData()
         },
-        async next() {
+        next() {
             this.page++
             this.refreshData()
         },
-        async onEnter() {
+        onEnter() {
             this.refreshData()
         },
         async createData() {
@@ -201,7 +199,7 @@ export default {
             await axios.delete(`http://localhost:3000/peta/${id}`)
             this.refreshData()
         },
-        async selectRow(id, index) {
+        selectRow(id, index) {
             this.selectedRow = { id, index }
         },
         async updateData() {

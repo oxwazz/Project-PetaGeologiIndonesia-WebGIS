@@ -78,7 +78,7 @@ export default {
         const { id } = this.$route.params
         const { data } = await axios.get(`http://localhost:3000/peta/${id}`)
         this.data = data[0]
-        this.img = `http://localhost:3000/peta/photo/${id}`
+        this.img = `http://localhost:3000/peta/${id}/photo`
     }
 }
 </script>
