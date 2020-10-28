@@ -20,7 +20,7 @@
         </nav>
     </div>
 
-    <div class="container" style="margin-top: 40px">
+    <div class="container" style="margin-top: 75px">
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -67,7 +67,8 @@
                                 <a :href="`/peta/${rectangle.data[i].id}`">More Details</a><br><br>
                                 <img :src="`http://localhost:3000/peta/${rectangle.data[i].id}/photo?t=${rectangle.data[i].img}`" style="width: 300px;"><br>
                                 <button @click="setIdIndex(rectangle.data[i].id, i)"  data-toggle="modal" data-target="#exampleModal2">Edit</button>
-                                <button @click="deleteData(rectangle.data[i].id)">Hapus</button>
+                                <button @click="setIdIndex(rectangle.data[i].id, i)" data-toggle="modal" data-target="#exampleModalCenter">Hapus</button>
+                                <!-- <button @click="deleteData(rectangle.data[i].id)">Hapus</button> -->
                             </l-popup>
                         </l-rectangle>
                     </div>
@@ -75,8 +76,6 @@
             </div>
         </div>
     </div>
-
-    
 
     <!-- Modal edit -->
     <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -108,12 +107,67 @@
                     
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button @click="updateData()" data-dismiss="modal" class="btn btn-primary" >Edit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button @click="updateData()" data-dismiss="modal" class="btn btn-primary">Edit</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal hapus -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Delete Peta?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            Are you sure delete this peta?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button @click="deleteData(idIndex.id)" data-dismiss="modal" type="button" class="btn btn-danger">Delete</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+        <!-- Modal tambah -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah peta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Indeks Peta">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Skala">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Tahun Terbit">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Penyusun">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Penerbit">
+
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="a">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="b">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="c">
+                    <input class="form-control form-control-sm mb-2" type="text" placeholder="d">
+
+                    <input type="file" accept="image/*" ref="fileInput">
+                    
+                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button class="btn btn-primary" data-dismiss="modal">Tambah</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 </div>
 </template>
 

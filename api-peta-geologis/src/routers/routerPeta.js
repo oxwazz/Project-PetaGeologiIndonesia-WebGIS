@@ -7,7 +7,7 @@ const auth = require('../middleware/auth')
 
 const router = express.Router()
 
-router.get('/peta', auth, async (req, res) => {
+router.get('/peta', async (req, res) => {
     try {
         const page = req.query.page
         const show = req.query.show

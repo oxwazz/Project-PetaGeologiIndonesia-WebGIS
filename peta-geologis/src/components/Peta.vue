@@ -32,7 +32,6 @@ import VGeosearch from 'vue2-leaflet-geosearch'
 import LControlFullscreen from 'vue2-leaflet-fullscreen'
 import peta from '../services/petaServices'
 
-
 // fix the marker
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.3.4/dist/images/";
 

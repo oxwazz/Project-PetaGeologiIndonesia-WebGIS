@@ -38,7 +38,12 @@ async function checkInput() {
         password: this.password,
         konfirmasiPassword: this.konfirmasiPassword
     })
-    console.log(rows.data)
+    if (rows.data.error) {
+        console.log('error register')
+        return 'error register'
+    }
+
+    this.$router.push('/')
 }
 
 export default {

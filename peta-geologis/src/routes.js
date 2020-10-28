@@ -11,12 +11,11 @@ export const routes = [
     { path: '/', component: Index },
     { path: '/peta', component: Peta },
     { path: '/peta/:id', component: Detail },
-
+    
     { path: '/admin', component: Admin, children:[
         { path: 'peta/', component: AdminPeta },
         { path: 'table/', component: AdminTable },
-
-    { path: '/register', component: Register }
-    ] },
-
+        ]},
+    
+    { path: '/register', component: Register },
 ]

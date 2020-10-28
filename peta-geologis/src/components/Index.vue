@@ -22,14 +22,14 @@
                             <label for="password">Password</label>
                             <input v-model="password" type="password" class="form-control" name="password" id="password">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="dropdownCheck">
                                 <label class="form-check-label" for="dropdownCheck">
                                     Remember me
                                 </label>
                             </div>
-                        </div>
+                        </div> -->
                         <button @click.prevent="login" type="submit" name="login" class="btn btn-primary">Login</button>
                     </form>
                     <div class="dropdown-divider"></div>
@@ -100,8 +100,6 @@ async function login() {
 
     this.$router.push('/admin/peta')
 }
-
-
 
 export default {
     data() {

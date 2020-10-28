@@ -44,6 +44,7 @@ router.post('/register', async (req, res) => {
 
         res.send(`Successfully Resgister`)
     } catch (e) {
+        console.log(e)
         res.send(e)
     }
 })
