@@ -25,12 +25,13 @@
 </template>
 
 <script>
-const axios = require('axios')
 import L from 'leaflet'
 import { OpenStreetMapProvider } from 'leaflet-geosearch'
 import { LMap, LTileLayer, LRectangle, LPopup, LControlLayers, LControlZoom } from 'vue2-leaflet'
 import VGeosearch from 'vue2-leaflet-geosearch'
 import LControlFullscreen from 'vue2-leaflet-fullscreen'
+import peta from '../services/petaServices'
+
 
 // fix the marker
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.3.4/dist/images/";
@@ -64,12 +65,12 @@ export default {
             },
         }
     },
-
+    
     async mounted () {
         // delete zoom default
        this.$refs.map.mapObject.zoomControl.remove()
 
-        const rows = await axios.get(`http://localhost:3000/peta`)
+        const rows = await peta.getPeta()
         for (let i of rows.data) {
             this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
             this.rectangle.data.push(i)

@@ -65,7 +65,7 @@
 </template>
 
 <script>
-const axios = require('axios')
+import peta from '../services/petaServices'
 
 export default {
     data() {
@@ -76,7 +76,7 @@ export default {
     },
     async mounted() {
         const { id } = this.$route.params
-        const { data } = await axios.get(`http://localhost:3000/peta/${id}`)
+        const { data } = await peta.getPetaById(id)
         this.data = data[0]
         this.img = `http://localhost:3000/peta/${id}/photo`
     }

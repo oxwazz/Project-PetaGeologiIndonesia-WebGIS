@@ -1,6 +1,6 @@
 <template>
 <div>
-    <!-- <div class="container">	
+    <div class="container">	
         <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand">Peta Geologi Indonesia</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,9 +11,9 @@
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                 </ul>
                 <div class="dropdown">
-                    <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span>username</span><img src="account.svg" width="36" height="36"></a>
+                    <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <span>{{ username }}</span></a>
                     <div class="dropdown-menu dropdown-menu-lg-right">
-                        <a class="dropdown-item" href="login.html">Logout</a>
+                        <a class="dropdown-item" @click="logout">Logout</a>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
 
         <div class="card shadow">
             <!-- Card Header - Dropdown -->
@@ -118,14 +118,72 @@
 </template>
 
 <script>
-const axios = require('axios')
+// import axios from 'axios'
 import L from 'leaflet';
 import { LMap, LTileLayer, LRectangle, LPopup, LControlLayers } from 'vue2-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import VGeosearch from 'vue2-leaflet-geosearch';
+import peta from '../../services/petaServices'
 
 // fix the marker
 L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.3.4/dist/images/";
+
+function setIdIndex(id, index) {
+    this.idIndex = { id, index }
+}
+
+async function updateData() {
+    let coba = new FormData()
+    let id = this.idIndex.id
+    let index = this.idIndex.index
+
+    coba.append('json', `{
+        "indexPeta": "${this.rectangle.data[index].lembar_peta}",
+        "skala": "${this.rectangle.data[index].skala}",
+        "tahun": "${this.rectangle.data[index].tahun}",
+        "penyusun": "${this.rectangle.data[index].penyusun}",
+        "penerbit": "${this.rectangle.data[index].penerbit}",
+        "a": "${this.rectangle.data[index].a}",
+        "b": "${this.rectangle.data[index].b}",
+        "c": "${this.rectangle.data[index].c}",
+        "d": "${this.rectangle.data[index].d}"
+    }`);
+
+    coba.append('image', this.image);
+
+    await peta.putPetaById(id, coba)
+
+    this.$refs.fileInputEdit.value = ''
+    this.image = ''
+
+    this.refresh()
+}
+
+function editImage() {
+    this.image =  this.$refs.fileInputEdit.files[0]
+}
+
+async function deleteData(id) {
+    await peta.deletePetaById(id)
+    this.$refs.map.mapObject.closePopup()
+    this.refresh()
+}
+
+async function logout() {
+    await peta.logoutAdmin()
+    this.$router.push('/')
+}
+
+async function refresh() {
+    this.rectangle.bounds = []
+    this.rectangle.data = []
+
+    const rows = await peta.getPeta()
+    for (let i of rows.data) {
+        this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
+        this.rectangle.data.push(i)
+    }
+}
 
 export default {
     components: { LMap, LTileLayer, LRectangle, LPopup, LControlLayers, VGeosearch },
@@ -156,73 +214,20 @@ export default {
             },
             idIndex: { id: 0, index: 0 },
             image: '',
-            redi: ''
+            username: ''
         }
     },
-
-    async mounted () {
-        const rows = await axios.get(`http://localhost:3000/peta`)
-        for (let i of rows.data) {
-            this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
-            this.rectangle.data.push(i)
-        }
-    },
-
     methods: {
-        setIdIndex(id, index) {
-            this.idIndex = { id, index }
-        },
-        async updateData() {
-            let coba = new FormData()
-            let id = this.idIndex.id
-            let index = this.idIndex.index
-
-            coba.append('json', `{
-                "indexPeta": "${this.rectangle.data[index].lembar_peta}",
-                "skala": "${this.rectangle.data[index].skala}",
-                "tahun": "${this.rectangle.data[index].tahun}",
-                "penyusun": "${this.rectangle.data[index].penyusun}",
-                "penerbit": "${this.rectangle.data[index].penerbit}",
-                "a": "${this.rectangle.data[index].a}",
-                "b": "${this.rectangle.data[index].b}",
-                "c": "${this.rectangle.data[index].c}",
-                "d": "${this.rectangle.data[index].d}"
-            }`);
-
-            coba.append('image', this.image);
-
-            await axios.put(`http://localhost:3000/peta/${id}`, coba, {
-                headers: { "Content-Type": "multipart/form-data" }
-            })
-
-            this.$refs.fileInputEdit.value = ''
-            this.image = ''
-
-            // this.$router.go(0)
-            this.refresh()
-
-        },
-        editImage() {
-            this.image =  this.$refs.fileInputEdit.files[0]
-        },
-        async deleteData(id) {
-            await axios.delete(`http://localhost:3000/peta/${id}`)
-            // this.$router.go(0)
-            this.$refs.map.mapObject.closePopup()
-            this.refresh()
-        },
-        async refresh () {
-        this.rectangle.bounds = []
-        this.rectangle.data = []
-
-        const rows = await axios.get(`http://localhost:3000/peta`)
-        for (let i of rows.data) {
-            this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
-            this.rectangle.data.push(i)
-        }
-        }
+        setIdIndex,
+        updateData,
+        editImage,
+        deleteData,
+        refresh,
+        logout
     },
-
-
-};
+    mounted () {
+        this.username = JSON.parse(localStorage.getItem('token')).username
+        this.refresh()
+    }
+}
 </script>
