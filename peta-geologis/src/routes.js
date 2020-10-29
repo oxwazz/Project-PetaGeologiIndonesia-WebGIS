@@ -4,7 +4,7 @@ import Detail from './components/Detail.vue'
 import Register from './components/Register.vue'
 
 import Admin from './components/admin/Admin.vue'
-import AdminTable from './components/admin/AdminTable.vue'
+// import AdminTable from './components/admin/AdminTable.vue'
 import AdminPeta from './components/admin/AdminPeta.vue'
 
 export const routes = [
@@ -14,7 +14,7 @@ export const routes = [
     
     { path: '/admin', component: Admin, children:[
         { path: 'peta/', component: AdminPeta },
-        { path: 'table/', component: AdminTable },
+        // { path: 'table/', component: AdminTable },
         ]},
     
     { path: '/register', component: Register },

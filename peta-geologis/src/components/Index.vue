@@ -22,14 +22,6 @@
                             <label for="password">Password</label>
                             <input v-model="password" type="password" class="form-control" name="password" id="password">
                         </div>
-                        <!-- <div class="form-group">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="dropdownCheck">
-                                <label class="form-check-label" for="dropdownCheck">
-                                    Remember me
-                                </label>
-                            </div>
-                        </div> -->
                         <button @click.prevent="login" type="submit" name="login" class="btn btn-primary">Login</button>
                     </form>
                     <div class="dropdown-divider"></div>
@@ -115,8 +107,8 @@ export default {
         login
     },
     async mounted() {
-        const tes = await peta.deletePetaById(-1)
-        if (tes.data.error) {
+        const row = await peta.deletePetaById(-1)
+        if (row.data.error) {
             this.statusLogin = true
         } else {
             this.statusLogin = false

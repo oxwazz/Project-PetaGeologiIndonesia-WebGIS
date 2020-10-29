@@ -4,7 +4,6 @@ const connection = require('../db/mysql2')
 const auth = async (req, res, next) => {
     try {
         const token = req.header('Authorization').replace('Bearer ', '')
-        console.log(">>>>>>>>>>>>>>>>>", token)
         const decode = await jwt.verify(token, 'SECRET_KEYZ')
         const [row] = await connection.promise().query(`
             SELECT *

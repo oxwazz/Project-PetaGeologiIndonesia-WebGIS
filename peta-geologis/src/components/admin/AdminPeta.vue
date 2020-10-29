@@ -68,7 +68,6 @@
                                 <img :src="`http://localhost:3000/peta/${rectangle.data[i].id}/photo?t=${rectangle.data[i].img}`" style="width: 300px;"><br>
                                 <button @click="setIdIndex(rectangle.data[i].id, i)"  data-toggle="modal" data-target="#exampleModal2">Edit</button>
                                 <button @click="setIdIndex(rectangle.data[i].id, i)" data-toggle="modal" data-target="#exampleModalCenter">Hapus</button>
-                                <!-- <button @click="deleteData(rectangle.data[i].id)">Hapus</button> -->
                             </l-popup>
                         </l-rectangle>
                     </div>
@@ -100,7 +99,7 @@
                     <input v-model="rectangle.data[idIndex.index].d" class="form-control form-control-sm mb-2" type="text" placeholder="d">
                     <br>
                     <p>File IMG: {{ rectangle.data[idIndex.index].img }}</p>
-                    <input type="file" accept="image/*" @change="editImage()" ref="fileInputEdit">
+                    <input type="file" accept="image/*" @change="insertImageEdit()" ref="insertImageEdit">
                     <br>
                     <br>
                     <p>File TIF:</p>
@@ -135,44 +134,43 @@
     </div>
     </div>
 
-        <!-- Modal tambah -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tambah peta</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Indeks Peta">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Skala">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Tahun Terbit">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Penyusun">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="Penerbit">
+    <!-- Modal tambah -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah peta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+               <input v-model="detailPeta.indexPeta" class="form-control form-control-sm mb-2" type="text" placeholder="Indeks Peta">
+                <input v-model="detailPeta.skala" class="form-control form-control-sm mb-2" type="text" placeholder="Skala">
+                <input v-model="detailPeta.tahun" class="form-control form-control-sm mb-2" type="text" placeholder="Tahun Terbit">
+                <input v-model="detailPeta.penyusun" class="form-control form-control-sm mb-2" type="text" placeholder="Penyusun">
+                <input v-model="detailPeta.penerbit" class="form-control form-control-sm mb-2" type="text" placeholder="Penerbit">
 
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="a">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="b">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="c">
-                    <input class="form-control form-control-sm mb-2" type="text" placeholder="d">
+                <input v-model="detailPeta.a" class="form-control form-control-sm mb-2" type="text" placeholder="a">
+                <input v-model="detailPeta.b" class="form-control form-control-sm mb-2" type="text" placeholder="b">
+                <input v-model="detailPeta.c" class="form-control form-control-sm mb-2" type="text" placeholder="c">
+                <input v-model="detailPeta.d" class="form-control form-control-sm mb-2" type="text" placeholder="d">
 
-                    <input type="file" accept="image/*" ref="fileInput">
-                    
-                </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button class="btn btn-primary" data-dismiss="modal">Tambah</button>
-                    </div>
+                <input type="file" accept="image/*" @change="insertImageTambah()" ref="insertImageTambah">
+
+            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" data-dismiss="modal" @click="createData">Tambah</button>
                 </div>
             </div>
         </div>
+    </div>
 
 </div>
 </template>
 
 <script>
-// import axios from 'axios'
 import L from 'leaflet';
 import { LMap, LTileLayer, LRectangle, LPopup, LControlLayers } from 'vue2-leaflet';
 import { OpenStreetMapProvider } from 'leaflet-geosearch';
@@ -186,41 +184,65 @@ function setIdIndex(id, index) {
     this.idIndex = { id, index }
 }
 
-async function updateData() {
-    let coba = new FormData()
-    let id = this.idIndex.id
-    let index = this.idIndex.index
+async function createData() {
+    let data = new FormData()
+    const { lembar_peta, skala, tahun, penyusun, penerbit, a, b, c, d } = this.detailPeta
 
-    coba.append('json', `{
-        "indexPeta": "${this.rectangle.data[index].lembar_peta}",
-        "skala": "${this.rectangle.data[index].skala}",
-        "tahun": "${this.rectangle.data[index].tahun}",
-        "penyusun": "${this.rectangle.data[index].penyusun}",
-        "penerbit": "${this.rectangle.data[index].penerbit}",
-        "a": "${this.rectangle.data[index].a}",
-        "b": "${this.rectangle.data[index].b}",
-        "c": "${this.rectangle.data[index].c}",
-        "d": "${this.rectangle.data[index].d}"
+    data.append('json', `{
+        "indexPeta": "${lembar_peta}",
+        "skala": "${skala}",
+        "tahun": "${tahun}",
+        "penyusun": "${penyusun}",
+        "penerbit": "${penerbit}",
+        "a": "${a}",
+        "b": "${b}",
+        "c": "${c}",
+        "d": "${d}"
     }`);
-
-    coba.append('image', this.image);
-
-    await peta.putPetaById(id, coba)
-
-    this.$refs.fileInputEdit.value = ''
-    this.image = ''
-
-    this.refresh()
+    data.append('image', this.image);
+    
+    await peta.createPeta(data)
+    this.refreshData()
+    this.loadData()
 }
 
-function editImage() {
-    this.image =  this.$refs.fileInputEdit.files[0]
+async function updateData() {
+    let data = new FormData()
+    let id = this.idIndex.id
+    let index = this.idIndex.index
+    const { lembar_peta, skala, tahun, penyusun, penerbit, a, b, c, d } = this.rectangle.data[index]
+
+    data.append('json', `{
+        "indexPeta": "${lembar_peta}",
+        "skala": "${skala}",
+        "tahun": "${tahun}",
+        "penyusun": "${penyusun}",
+        "penerbit": "${penerbit}",
+        "a": "${a}",
+        "b": "${b}",
+        "c": "${c}",
+        "d": "${d}"
+    }`);
+    data.append('image', this.image);
+
+    await peta.putPetaById(id, data)
+    this.refreshData()
+    this.loadData()
+}
+
+function insertImageEdit() {
+    this.image =  this.$refs.insertImageEdit.files[0]
+}
+
+function insertImageTambah() {
+    this.image =  this.$refs.insertImageTambah.files[0]
 }
 
 async function deleteData(id) {
     await peta.deletePetaById(id)
     this.$refs.map.mapObject.closePopup()
-    this.refresh()
+    this.refreshData()
+    this.loadData()
 }
 
 async function logout() {
@@ -228,15 +250,21 @@ async function logout() {
     this.$router.push('/')
 }
 
-async function refresh() {
-    this.rectangle.bounds = []
-    this.rectangle.data = []
-
+async function loadData() {
     const rows = await peta.getPeta()
     for (let i of rows.data) {
         this.rectangle.bounds.push([[i.a, i.b], [i.c, i.d]])
         this.rectangle.data.push(i)
     }
+}
+
+function refreshData() {
+    this.rectangle.bounds = []
+    this.rectangle.data = []
+
+    this.$refs.insertImageEdit.value = ''
+    this.$refs.insertImageTambah.value = ''
+    this.image = ''
 }
 
 export default {
@@ -260,11 +288,32 @@ export default {
             ],
             rectangle: {
                 bounds: [],
-                data: [],
+                data: [{
+                    lembar_peta: '',
+                    skala: '1:',
+                    tahun: '',
+                    penyusun: '',
+                    penerbit:'',
+                    a: '',
+                    b: '',
+                    c: '',
+                    d: '',
+                }],
                 style: { color: 'red', weight: 3 }
             },
             geosearchOptions: { // Important part Here
                 provider: new OpenStreetMapProvider(),
+            },
+            detailPeta: {
+                lembar_peta: 'index peta cuy',
+                skala: '1:223232323',
+                tahun: '2020',
+                penyusun: 'Halim',
+                penerbit:'Oxwazz',
+                a: '5',
+                b: '2',
+                c: '3',
+                d: '4',
             },
             idIndex: { id: 0, index: 0 },
             image: '',
@@ -273,15 +322,18 @@ export default {
     },
     methods: {
         setIdIndex,
+        createData,
         updateData,
-        editImage,
+        insertImageEdit,
+        insertImageTambah,
         deleteData,
-        refresh,
+        refreshData,
+        loadData,
         logout
     },
     mounted () {
         this.username = JSON.parse(localStorage.getItem('token')).username
-        this.refresh()
+        this.loadData()
     }
 }
 </script>

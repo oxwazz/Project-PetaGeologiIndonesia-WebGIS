@@ -55,8 +55,10 @@ router.post('/peta', auth, upload, async (req, res) => {
             )`
         )
         
+        console.log(`Succesfully INSERT ${row[0].affectedRows} row!`)
         res.send(`Succesfully INSERT ${row[0].affectedRows} row!`)
     } catch (e) {
+        console.log(e)
         res.send(e)
     }
 })
@@ -74,28 +76,28 @@ router.put('/peta/:id', auth, upload, async (req, res) => {
         if (Object.values(json).includes('')) {
             throw { error: 'gaoleh kosong lur' }
         }
-
+        
         const { indexPeta, skala, tahun, penyusun, penerbit, a, b, c, d } = json
         const id = req.params.id
         
         if (!req.file) {
             const row = await connection.promise().query(`
-                UPDATE
-                    maps
-                SET
-                    lembar_peta = '${indexPeta}',
-                    skala = '${skala}',
-                    tahun = '${tahun}',
-                    penyusun = '${penyusun}',
-                    penerbit = '${penerbit}',
-                    a = '${a}',
-                    b = '${b}',
-                    c = '${c}',
-                    d = '${d}'
-                WHERE
-                    id = ${id}`
+            UPDATE
+            maps
+            SET
+            lembar_peta = '${indexPeta}',
+            skala = '${skala}',
+            tahun = '${tahun}',
+            penyusun = '${penyusun}',
+            penerbit = '${penerbit}',
+            a = '${a}',
+            b = '${b}',
+            c = '${c}',
+            d = '${d}'
+            WHERE
+            id = ${id}`
             )
-
+            
             res.send(`Successfully UPDATE ${row[0].affectedRows} row on ID: ${id}`)  
         } else {
             const { filename } = req.file
@@ -123,6 +125,7 @@ router.put('/peta/:id', auth, upload, async (req, res) => {
             res.send(`Successfully UPDATE ${row[0].affectedRows} row on ID: ${id}`)  
         }
     } catch (e) {
+        console.log(e)
         res.send(e)
     }
 })
