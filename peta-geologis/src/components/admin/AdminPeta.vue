@@ -201,7 +201,7 @@ async function createData() {
     }`);
     data.append('image', this.image);
     
-    await peta.createPeta(data)
+    await peta.postPeta(data)
     this.refreshData()
     this.loadData()
 }
@@ -288,17 +288,7 @@ export default {
             ],
             rectangle: {
                 bounds: [],
-                data: [{
-                    lembar_peta: '',
-                    skala: '1:',
-                    tahun: '',
-                    penyusun: '',
-                    penerbit:'',
-                    a: '',
-                    b: '',
-                    c: '',
-                    d: '',
-                }],
+                data: [],
                 style: { color: 'red', weight: 3 }
             },
             geosearchOptions: { // Important part Here

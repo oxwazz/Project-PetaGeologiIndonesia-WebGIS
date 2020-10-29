@@ -8,8 +8,8 @@ const getPetaById = (id) => {
     return api.get(`peta/${id}`)
 }
 
-const putPetaById = (id, coba) => {
-    return api.put(`http://localhost:3000/peta/${id}`, coba, {
+const putPetaById = (id, data) => {
+    return api.put(`http://localhost:3000/peta/${id}`, data, {
             headers: { "Content-Type": "multipart/form-data" }
         })
 }
@@ -18,7 +18,7 @@ const deletePetaById = (id) => {
     return api.delete(`peta/${id}`)
 }
 
-const createPeta = (data) => {
+const postPeta = (data) => {
     return api.post('http://localhost:3000/peta', data, {
             headers: { "Content-Type": "multipart/form-data" }
         })
@@ -30,7 +30,7 @@ const logoutAdmin = () => {
 
 export default {
     getPeta,
-    createPeta,
+    postPeta,
     getPetaById,
     putPetaById,
     deletePetaById,

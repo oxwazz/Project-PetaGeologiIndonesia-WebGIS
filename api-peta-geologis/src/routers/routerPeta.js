@@ -38,7 +38,7 @@ router.post('/peta', auth, upload, async (req, res) => {
             throw { error: 'upload gambar dulu gan' }
         }
 
-        const { indexPeta, skala, tahun, penyusun, penerbit, a, b, c, d } = json
+        const { lembar_peta, skala, tahun, penyusun, penerbit, a, b, c, d } = json
         const { filename } = req.file
         
         const row = await connection.promise().query(`
@@ -49,7 +49,7 @@ router.post('/peta', auth, upload, async (req, res) => {
                 a, b, c, d
             )
             values(
-                '${indexPeta}', '${skala}', '${tahun}', 
+                '${lembar_peta}', '${skala}', '${tahun}', 
                 '${penyusun}', '${penerbit}', '12', '${filename}',
                 '${a}', '${b}', '${c}', '${d}'
             )`
@@ -77,7 +77,7 @@ router.put('/peta/:id', auth, upload, async (req, res) => {
             throw { error: 'gaoleh kosong lur' }
         }
         
-        const { indexPeta, skala, tahun, penyusun, penerbit, a, b, c, d } = json
+        const { lembar_peta, skala, tahun, penyusun, penerbit, a, b, c, d } = json
         const id = req.params.id
         
         if (!req.file) {
@@ -85,7 +85,7 @@ router.put('/peta/:id', auth, upload, async (req, res) => {
             UPDATE
             maps
             SET
-            lembar_peta = '${indexPeta}',
+            lembar_peta = '${lembar_peta}',
             skala = '${skala}',
             tahun = '${tahun}',
             penyusun = '${penyusun}',
@@ -107,7 +107,7 @@ router.put('/peta/:id', auth, upload, async (req, res) => {
                 UPDATE
                     maps
                 SET
-                    lembar_peta = '${indexPeta}',
+                    lembar_peta = '${lembar_peta}',
                     skala = '${skala}',
                     tahun = '${tahun}',
                     penyusun = '${penyusun}',
